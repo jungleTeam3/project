@@ -15,9 +15,9 @@
     </div>
     <div id="map" style="width:65%;height:760px"></div>
     <div id="pano" style="width: 65%;height: 300px;"></div>
-    <div id="infoDiv" style="position: absolute; display: none; background-color: white; border: 1px solid #ccc; padding: 10px;"></div>
 
 <script>
+var HOME_PATH = window.HOME_PATH || '.';
 
 var map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.2856373, 127.0345859),
@@ -25,9 +25,7 @@ var map = new naver.maps.Map('map', {
 });
 
 var pano = null;
-var infoDiv = $('#infoDiv');
 naver.maps.onJSContentLoaded = function() {
-    // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
     pano = new naver.maps.Panorama("pano", {
         position: new naver.maps.LatLng(37.2856373, 127.0345859),
         pov: {
@@ -37,27 +35,23 @@ naver.maps.onJSContentLoaded = function() {
         }
     });
 
-    // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
     naver.maps.Event.addListener(pano, 'pano_changed', function() {
         var latlng = pano.getPosition();
-
         if (!latlng.equals(map.getCenter())) {
             map.setCenter(latlng);
         }
     });
 };
 
-// 거리뷰 레이어를 생성합니다.
 var streetLayer = new naver.maps.StreetLayer();
 naver.maps.Event.once(map, 'init', function() {
     streetLayer.setMap(map);
 });
 
-// 거리뷰 버튼에 이벤트를 바인딩합니다.
 var btn = $('#street');
-var markerList = [];
+var markers = [];
 
-//더미 데이터
+// 더미 데이터
 var latlngs = [
     new naver.maps.LatLng(37.2856373, 127.0345859),
     new naver.maps.LatLng(37.2856373, 127.0355859),
@@ -66,109 +60,81 @@ var latlngs = [
 
 btn.on("click", function(e) {
     e.preventDefault();
-
-    // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
-    // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
     if (streetLayer.getMap()) {
         streetLayer.setMap(null);
-        removeAllMarkers();
         for (var i = 0, ii = latlngs.length; i < ii; i++) {
-            var marker = new naver.maps.Marker({
-                position: latlngs[i],
-                map: map
-            });
-
-            marker.set('seq', i);
-            markerList.push(marker);
-
-            // 마커 클릭 이벤트 처리
-            naver.maps.Event.addListener(marker, 'click', getMarkerClickHandler(i));
-            naver.maps.Event.addListener(marker, 'mouseover', getMarkerHoverHandler(i));
-            naver.maps.Event.addListener(marker, 'mouseout', getMarkerMouseOutHandler());
+            var marker = createMarker(latlngs[i]);
+            markers.push(marker);
         }
     } else {
         streetLayer.setMap(map);
-        removeAllMarkers();
+        hideMarkers();
     }
 });
 
-// 클릭한 마커의 인덱스를 기억하는 변수
-var clickedMarkerIndex = null;
-
-// 각 마커의 클릭 이벤트 핸들러 함수
-function getMarkerClickHandler(seq) {
-    return function(e) {
-        // 상세 페이즈 띄우게 할 예정
-    };
-}
-
-// 각 마커의 호버 이벤트 핸들러 함수
-function getMarkerHoverHandler(seq) {
-    return function(e) {
-        var marker = markerList[seq];
-
-        // 호버한 마커에 대한 InfoWindow 생성
-        var infoContent = '<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>"' + seq + '"</b>.</div>';
-        showInfoWindow(infoContent, marker.getPosition());
-    };
-}
-
-// 마커의 마우스 아웃 이벤트 핸들러 함수
-function getMarkerMouseOutHandler() {
-    return function(e) {
-        // 마우스가 마커 영역을 벗어났을 때, InfoWindow 숨김
-        infoDiv.hide();
-    };
-}
-
-// InfoWindow를 지정한 위치에 보여주는 함수
-function showInfoWindow(content, position) {
-    var overlayProjection = map.getProjection();
-    var pixelPosition = overlayProjection.fromCoordToOffset(position);
-
-    infoDiv.html(content);
-    infoDiv.css({
-        display: 'block',
-        position: 'absolute',
-        left: pixelPosition.x - 100 + 'px',
-        top: pixelPosition.y - 50 + 'px' // 마커 위에 조금 올린 위치
-    });
-}
-
-
-// 모든 마커를 지도에서 제거하는 함수
-function removeAllMarkers() {
-    clickedMarkerIndex = null;
-
-    for (var i = 0; i < markerList.length; i++) {
-        markerList[i].setMap(null);
-    }
-    markerList = [];
-}
-
-// 거리뷰 레이어가 변경되면 발생하는 이벤트를 지도로부터 받아 버튼의 상태를 변경합니다.
 naver.maps.Event.addListener(map, 'streetLayer_changed', function(streetLayer) {
     if (streetLayer) {
         btn.addClass('control-on');
-        
+        showMarkersOnHover();
     } else {
         btn.removeClass('control-on');
-        
+        hideMarkers();
     }
 });
 
-// 지도를 클릭했을 때 발생하는 이벤트를 받아 파노라마 위치를 갱신합니다. 이때 거리뷰 레이어가 있을 때만 갱신하도록 합니다.
 naver.maps.Event.addListener(map, 'click', function(e) {
     if (streetLayer.getMap()) {
         var latlng = e.coord;
-
-        // 파노라마의 setPosition()은 해당 위치에서 가장 가까운 파노라마(검색 반경 300미터)를 자동으로 설정합니다.
         pano.setPosition(latlng);
     }
 });
 
+function createMarker(position) {
+    var marker = new naver.maps.Marker({
+        position: position,
+        map: map
+    });
 
+    var infoWindow = new naver.maps.InfoWindow({
+        content: '<div style="width:150px;text-align:center;padding:10px;">Marker at (' + position.lat() + ', ' + position.lng() + ')</div>',
+        disableAutoPan: true
+    });
 
+    markers.push({ marker: marker, infoWindow: infoWindow });
+
+    naver.maps.Event.addListener(marker, 'mouseover', function() {
+        infoWindow.open(map, marker);
+    });
+
+    naver.maps.Event.addListener(marker, 'mouseout', function() {
+        infoWindow.close();
+    });
+
+    return marker;
+}
+
+function showMarkersOnHover() {
+    for (var i = 0; i < markers.length; i++) {
+        var marker = markers[i].marker;
+        naver.maps.Event.addListener(marker, 'mouseover', (function(marker) {
+            return function() {
+                marker.infoWindow.open(map, marker);
+            };
+        })(marker));
+
+        naver.maps.Event.addListener(marker, 'mouseout', (function(marker) {
+            return function() {
+                marker.infoWindow.close();
+            };
+        })(marker));
+    }
+}
+
+function hideMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].marker.setMap(null);
+    }
+}
 </script>
 </body>
 </html>
