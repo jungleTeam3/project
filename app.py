@@ -58,12 +58,12 @@ def register():
       session['email_give'] = email_receive
       session['id_give'] = id_receive
       session['nickname_give'] = nickname_receive
-   # db에 account 형식으로 추가.
+      # db에 account 형식으로 추가.
       account = {'ID' : id_receive, 'password' : pw_hash, 'email' : email_receive, 'nickname' : nickname_receive}
       db.user.insert_one(account)
        # 쿠키로 저장해두는 과정. 세션은 서버 메모리에, 쿠키는 클라이언트 PC에 생성됨. 
       #근데 사실 session으로 호출해도 되기때문에 필요하진 않는데, 실제 서비스라면 둘을 분담하긴 해야할 것. 세션만 쓰면 서버에 부하가 가니까.
-      resp = make_response(render_template('register.html'))
+      resp = make_response(jsonify({'result' :'success'}))
       resp.set_cookie('password',pw_hash)
       resp.set_cookie('email', email_receive)
       resp.set_cookie('ID', id_receive)

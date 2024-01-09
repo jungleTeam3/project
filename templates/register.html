@@ -116,7 +116,6 @@
     });
 
     function register(button) {
-    return new Promise(function(resolve, reject) {
         const registerInputNickname = document.getElementById("register-nickname");
         const registerInputID = document.getElementById("register-id");
         const registerInputEmail = document.getElementById("register-email");
@@ -137,36 +136,20 @@
                         // 성공하여 로그인 페이지로 이동하기.
                         alert("계정 생성 완료!");
                         window.location.href = '/login';
-                        resolve(response); // 성공 시 resolve 호출
                     } else {
                         console.log(response);
                         alert("서버 오류!");
-                        reject("서버 오류"); // 실패 시 reject 호출
                     }
                 } catch (error) {
                     console.error(error);
-                    reject("서버 응답 처리 오류"); // 서버 응답 처리 중 오류 발생 시 reject 호출
                 }
             },
             error: function(error) {
                 console.error(error);
-                reject("서버 요청 오류"); // 서버 요청 중 오류 발생 시 reject 호출
             }
         });
-    });
 }
 
-// 사용 예시
-register().then(
-    function(response) {
-        // 성공적으로 처리된 경우
-        console.log("Success:", response);
-    },
-    function(error) {
-        // 오류가 발생한 경우
-        console.error("Error:", error);
-    }
-);
 
 
 // 계정 생성 함수

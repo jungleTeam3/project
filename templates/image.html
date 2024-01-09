@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+</head>
+<body>
+    <h1>Image Gallery</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <hr>
+    <h2>Images</h2>
+    <ul>
+        {% for image in images %}
+            <li>
+                <img src="{{ url_for('get_image', image_id=image._id|string) }}" alt="Image">
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
