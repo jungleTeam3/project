@@ -6,7 +6,7 @@ import jwt
 #암호 만들기 위한 함수용
 import hashlib
 #만료 시간 설정하기 위해 임포트.
-import datetime
+from datetime import datetime, timedelta
 #CORS 에러 방ㅣ용
 from flask_cors import CORS
 
@@ -58,12 +58,12 @@ def register():
       session['email_give'] = email_receive
       session['id_give'] = id_receive
       session['nickname_give'] = nickname_receive
-   # db에 account 형식으로 추가.
+      # db에 account 형식으로 추가.
       account = {'ID' : id_receive, 'password' : pw_hash, 'email' : email_receive, 'nickname' : nickname_receive}
       db.user.insert_one(account)
        # 쿠키로 저장해두는 과정. 세션은 서버 메모리에, 쿠키는 클라이언트 PC에 생성됨. 
       #근데 사실 session으로 호출해도 되기때문에 필요하진 않는데, 실제 서비스라면 둘을 분담하긴 해야할 것. 세션만 쓰면 서버에 부하가 가니까.
-      resp = make_response(render_template('register.html'))
+      resp = make_response(jsonify({'result' :'success'}))
       resp.set_cookie('password',pw_hash)
       resp.set_cookie('email', email_receive)
       resp.set_cookie('ID', id_receive)
@@ -86,8 +86,10 @@ def login():
       #값이 실제로 있다면 JWT 토큰을 발급하기.
       if result is not None:
          #JWT토큰에는 payload와 시크릿키 필요. 시크릿키로 토큰을 디코딩하여 payload값 확인. exp항목으로 만료 시간, jwt토큰을 풀면 유저아이디 확인가능.
-         payload = {'id' : id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)}
-         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+         # payload = {'id' : id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)}
+         # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+         # expires = datetime.utcnow() + timedelta(days=1)
+         token = create_access_token(identity='id', expires_delta=timedelta(days=1))
       #세션을 생성하며, html에서 {session['id']} 등으로 호출 가능.
          session['id_give'] = id
          session['password_give'] = pw
