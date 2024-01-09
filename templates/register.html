@@ -1,0 +1,214 @@
+<!Doctype html>
+<html lang="ko">
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            crossorigin="anonymous">
+
+			  <!-- JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+
+        <title>크래프톤 정글 4기 | 정글 맛포럼</title>
+
+        <!-- style -->
+        <style type="text/css">
+            * {
+                font-family: "Stylish", sans-serif;
+            }
+
+            .wrap {
+                width: 900px;
+                margin: auto;
+            }
+
+        </style>
+
+    </head>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <body>
+    <main class="relative min-h-screen w-full bg-white">
+    <div class="p-6" x-data="app">
+        <!-- header -->
+        <header class="flex w-full justify-between">
+            <svg class="h-7 w-7 cursor-pointer text-gray-400 hover:text-gray-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                <path stroke-width="1" fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+
+            <!-- buttons -->
+            <div>
+                <button type="button" @click="isLoginPage = false" x-show="isLoginPage" class="rounded-2xl border-b-2 border-b-gray-300 bg-white px-4 py-3 font-bold text-blue-500 ring-2 ring-gray-300 hover:bg-gray-200 active:translate-y-[0.125rem] active:border-b-gray-200">LOGIN</button>
+
+                <button type="button" @click="isLoginPage = true" x-show="!isLoginPage" class="rounded-2xl border-b-2 border-b-gray-300 bg-white px-4 py-3 font-bold text-blue-500 ring-2 ring-gray-300 hover:bg-gray-200 active:translate-y-[0.125rem] active:border-b-gray-200">SIGN UP</button>
+            </div>
+        </header>
+
+        <div class="absolute left-1/2 top-1/2 mx-auto max-w-sm -translate-x-1/2 -translate-y-1/2 transform space-y-4 text-center">
+            <!-- register content -->
+            <div id="register-div" x-show="isLoginPage" class="space-y-4">
+                <header class="mb-3 text-2xl font-bold">Create your profile</header>
+                <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input id="register-nickname" type="text" placeholder="nickname" class="my-3 w-full border-none bg-transparent outline-none focus:outline-none" />
+                </div>
+                <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input id="register-id" type="text" placeholder="ID" class="my-3 w-full border-none bg-transparent outline-none focus:outline-none" />
+                </div>
+                <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input id="register-email" type="text" placeholder="Email" class="my-3 w-full border-none bg-transparent outline-none focus:outline-none" />
+                </div>
+                <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input id="register-password" type="password" placeholder="Password" class="my-3 w-full border-none bg-transparent outline-none focus:outline-none" />
+                </div>
+                <button id="register-button" class="w-full rounded-2xl border-b-4 border-b-blue-600 bg-blue-500 py-3 font-bold text-white hover:bg-blue-400 active:translate-y-[0.125rem] active:border-b-blue-400">CREATE ACCOUNT</button>
+            </div>
+
+            <!-- login content -->
+            <div x-show="!isLoginPage" class="space-y-4">
+                <header class="mb-3 text-2xl font-bold">Log in</header>
+                <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input type="text" placeholder="Email or username" class="my-3 w-full border-none bg-transparent outline-none focus:outline-none" />
+                </div>
+                <div class="flex w-full items-center space-x-2 rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-400">
+                    <input type="password" placeholder="Password" class="my-3 w-full border-none bg-transparent outline-none" />
+                    <a href="#" class="font-medium text-gray-400 hover:text-gray-500">FORGOT?</a>
+                </div>
+                <button class="w-full rounded-2xl border-b-4 border-b-blue-600 bg-blue-500 py-3 font-bold text-white hover:bg-blue-400 active:translate-y-[0.125rem] active:border-b-blue-400">LOG IN</button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <hr class="w-full border border-gray-300" />
+                <div class="font-semibold text-gray-400">OR</div>
+                <hr class="w-full border border-gray-300" />
+            </div>
+
+            <footer>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="#" class="rounded-2xl border-b-2 border-b-gray-300 bg-white px-4 py-2.5 font-bold text-blue-700 ring-2 ring-gray-300 hover:bg-gray-200 active:translate-y-[0.125rem] active:border-b-gray-200">FACEBOOK</a>
+                    <a href="#" class="rounded-2xl border-b-2 border-b-gray-300 bg-white px-4 py-2.5 font-bold text-blue-500 ring-2 ring-gray-300 hover:bg-gray-200 active:translate-y-[0.125rem] active:border-b-gray-200">GOOGLE</a>
+                </div>
+
+                <div class="mt-8 text-sm text-gray-400">
+                    By signing in to ********, you agree to our
+                    <a href="#" class="font-medium text-gray-500">Terms</a> and <a href="#" class="font-medium text-gray-500">Privacy Policy</a>.
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("app", () => ({
+            isLoginPage: true,
+        }));
+    });
+
+    function register(button) {
+    return new Promise(function(resolve, reject) {
+        const registerInputNickname = document.getElementById("register-nickname");
+        const registerInputID = document.getElementById("register-id");
+        const registerInputEmail = document.getElementById("register-email");
+        const registerInputPw = document.getElementById("register-password");
+        const id = registerInputID.value;
+        const password = registerInputPw.value;
+        const email = registerInputEmail.value;
+        const nickname = registerInputNickname.value;
+
+        // 넣은 ID와 패스워드로 DB에 계정 추가하기
+        $.ajax({
+            type: "POST",
+            url: "/register",
+            data: {id_give: id, password_give: password, email_give: email, nickname_give: nickname},
+            success: function(response) {
+                try {
+                    if (response["result"] === "success") {
+                        // 성공하여 로그인 페이지로 이동하기.
+                        alert("계정 생성 완료!");
+                        window.location.href = '/login';
+                        resolve(response); // 성공 시 resolve 호출
+                    } else {
+                        console.log(response);
+                        alert("서버 오류!");
+                        reject("서버 오류"); // 실패 시 reject 호출
+                    }
+                } catch (error) {
+                    console.error(error);
+                    reject("서버 응답 처리 오류"); // 서버 응답 처리 중 오류 발생 시 reject 호출
+                }
+            },
+            error: function(error) {
+                console.error(error);
+                reject("서버 요청 오류"); // 서버 요청 중 오류 발생 시 reject 호출
+            }
+        });
+    });
+}
+
+// 사용 예시
+register().then(
+    function(response) {
+        // 성공적으로 처리된 경우
+        console.log("Success:", response);
+    },
+    function(error) {
+        // 오류가 발생한 경우
+        console.error("Error:", error);
+    }
+);
+
+
+// 계정 생성 함수
+// function register(button) {
+
+//     const registerInputnickname = document.getElementById("register-nickname");
+//     const registerInputID = document.getElementById("register-id");
+//     const registerInputEmail = document.getElementById("register-email");
+//     const registerInputPw = document.getElementById("register-password");
+//     const id = registerInputID.value;
+//     const password = registerInputPw.value;
+//     const email = registerInputEmail.value;
+//     const nickname = registerInputnickname.value;
+    
+//     // 넣은 ID와 패스워드로 DB에 계정 추가하기
+//      return new Promise(function(resolve,reject){ 
+//         $.ajax({
+//             type: "POST", // POST 방식으로 요청하겠다.
+//             url: "/register", // 
+//             data: {id_give: id, password_give: password, email_give: email, nickname_give: nickname}, // 데이터를 주는 방법
+//             success: async function (response) { 
+//                 try{// 성공하면
+//                             {
+//                     if (response["result"] === "success") {
+//                         // if문으로 db와 대조하여 일치하는게 없을 때만 생성.
+//                         alert("계정 생성 완료!");
+//                         // 성공하여 로그인 페이지로 이동하기.
+//                         window.location.href = '/login'
+//                     } else {
+//                         console.log(response);
+//                         alert("서버 오류!");
+//                     }
+//                 }
+//             }
+//             catch(error) {
+//                 console.error(error)
+//             }
+//         }
+//     })
+//     })
+// }
+    const registerbutton = document.getElementById("register-button");
+    registerbutton.addEventListener("click",register);
+</script>
+</html>
