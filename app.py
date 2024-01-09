@@ -7,9 +7,15 @@ import jwt
 import hashlib
 #만료 시간 설정하기 위해 임포트.
 import datetime
+#CORS 에러 방ㅣ용
+from flask_cors import CORS
+
+
 app = Flask(__name__)
 
-SECRET_KEY = 'JUngle'
+CORS(app)
+app.config['SECRET_KEY'] = 'dsfdsafdsafdsafdsagdsdgdsafasdf'
+SECRET_KEY = "dsfdsafdsafdsafdsagdsdgdsafasdf"
 # 토큰 생성에 사용될 Secret Key를 flask 환경 변수에 등록
 # app.config.update(
 # 			DEBUG = True,
@@ -23,7 +29,8 @@ import requests
 
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
-db = client.dbjungleZero
+db = client.jungleweekzero
+collection = db['user']
 
 @app.route('/')
 def home():
@@ -56,7 +63,7 @@ def register():
       db.user.insert_one(account)
        # 쿠키로 저장해두는 과정. 세션은 서버 메모리에, 쿠키는 클라이언트 PC에 생성됨. 
       #근데 사실 session으로 호출해도 되기때문에 필요하진 않는데, 실제 서비스라면 둘을 분담하긴 해야할 것. 세션만 쓰면 서버에 부하가 가니까.
-      resp = make_response(render_template('index.html'))
+      resp = make_response(render_template('register.html'))
       resp.set_cookie('password',pw_hash)
       resp.set_cookie('email', email_receive)
       resp.set_cookie('ID', id_receive)
@@ -67,11 +74,11 @@ def register():
 
 # API #3 : 로그인 페이지를 띄우고 결과를 반환합니다.
 @app.route('/login', methods = ['POST', 'GET'])
-def login_input():
+def login():
    # POST 요청시 로그인 여부 확인하기.
    if request.method == 'POST':
       id = request.form['id_give']
-      pw = request.form['pw_give']
+      pw = request.form['password_give']
       #비밀번호를 똑같은 방식으로 암호화.
       pw_hash = hashlib.sha256(pw.encode('utf-8')).hexdigest()
       #아이디와 비밀번호를 가지고 해당 유저를 db에서 탐색.
