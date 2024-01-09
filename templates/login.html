@@ -16,8 +16,14 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
             crossorigin="anonymous"></script>
 
+            <!--jQuery 플러그인으로 쿠키함수 사용-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+
         <!-- 구글폰트 -->
         <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        
 
 
         <title>크래프톤 정글 4기 | 정글 맛포럼</title>
@@ -46,6 +52,7 @@
                     url : "/login",
                     data : {id_give : id, password_give: pw},
                     success: function(response){
+                        console.log(response)
                         if(response['result'] =='success') {
                             // 토큰을 받아와 mytoken으로 저장.
                             $.cookie('mytoken', response['token']);
@@ -53,37 +60,11 @@
                             window.location.href = '/'
                         }
                         else{
-                            alert(response['error'])
+                            alert('error')
                         }
                 }})}
         
                     
-
-            // 계정 생성 함수
-            function register() {
-                let id = $("#register-id").val();
-                let password = $("#register-password").val();
-                let email = $("#register-email").val();
-                let nickname = $("#register-nickname").val();
-
-                
-                // 넣은 ID와 패스워드로 DB에 계정 추가하기
-                $.ajax({
-                    type: "POST", // POST 방식으로 요청하겠다.
-                    url: "/register", // 
-                    data: {id_give: id, password_give: password, email_give: email, nickname_give: nickname}, // 데이터를 주는 방법
-                    success: function (response) { // 성공하면
-                        if (response["result"] == "success") {
-                            // if문으로 db와 대조하여 일치하는게 없을 때만 생성.
-                            alert("계정 생성 완료!");
-                            // 성공하여 로그인 페이지로 이동하기.
-                            window.location.href = '/login'
-                        } else {
-                            alert("서버 오류!")
-                        }
-                    }
-                })
-            }ß
 
             //로그아웃 함수.. 근데 이러면 API랑 기능이 중복되지 않나?? 의문. 
     
@@ -102,9 +83,36 @@
 
     </head>
 
-    <body>
-        <div class="wrap">
-        </div>
-    </body>
+<!-- component -->
+    <body class="bg-gray-10 ">
+    <div class="flex justify-center h-screen w-screen items-center">
+     <div class="w-full md:w-1/2 flex flex-col items-center " >
+         <!-- text login -->
+         <h1 class="text-center text-2xl font-bold text-gray-600 mb-6">LOGIN</h1>
+         <!-- email input -->
+         <div class="w-3/4 mb-6">
+             <input type="id" name="id" id="login-id" class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500" placeholder="User Name">
+         </div>
+         <!-- password input -->
+         <div class="w-3/4 mb-6">
+             <input type="password" name="password" id="login-pw" class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500 " placeholder="Password">
+         </div>
+         <!-- remember input -->
+         <div class="w-3/4 flex flex-row justify-between">
+             <div class=" flex items-center gap-x-1">
+                 <input type="checkbox" name="remember" id="" class=" w-4 h-4  ">
+                 <label for="" class="text-sm text-slate-400">Remember me</label>
+             </div>
+             <div>
+                 <a href="#" class="text-sm text-slate-400 hover:text-blue-500">Forgot?</a>
+             </div>
+         </div>
+         <!-- button -->
+         <div class="w-3/4 mt-4">
+             <button type="submit" class="py-4 bg-blue-400 w-full rounded text-blue-50 font-bold hover:bg-blue-700" onclick="login()"> LOGIN</button>
+         </div>
+     </div>
+    </div>
+     </body>
 
 </html>
