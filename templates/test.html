@@ -17,8 +17,6 @@
     <div id="pano" style="width: 65%;height: 300px;"></div>
 
 <script>
-var HOME_PATH = window.HOME_PATH || '.';
-
 var map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.2856373, 127.0345859),
     zoom: 17
@@ -26,6 +24,7 @@ var map = new naver.maps.Map('map', {
 
 var pano = null;
 naver.maps.onJSContentLoaded = function() {
+    // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
     pano = new naver.maps.Panorama("pano", {
         position: new naver.maps.LatLng(37.2856373, 127.0345859),
         pov: {
@@ -34,7 +33,7 @@ naver.maps.onJSContentLoaded = function() {
             fov: 100
         }
     });
-
+    // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
     naver.maps.Event.addListener(pano, 'pano_changed', function() {
         var latlng = pano.getPosition();
         if (!latlng.equals(map.getCenter())) {
@@ -42,15 +41,14 @@ naver.maps.onJSContentLoaded = function() {
         }
     });
 };
-
+// 거리뷰 레이어를 생성합니다.
 var streetLayer = new naver.maps.StreetLayer();
 naver.maps.Event.once(map, 'init', function() {
     streetLayer.setMap(map);
 });
-
+// 거리뷰 버튼에 이벤트를 바인딩합니다.
 var btn = $('#street');
 var markers = [];
-
 // 더미 데이터
 var latlngs = [
     new naver.maps.LatLng(37.2856373, 127.0345859),
@@ -60,14 +58,16 @@ var latlngs = [
 
 btn.on("click", function(e) {
     e.preventDefault();
+
+    // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
+    // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
     if (streetLayer.getMap()) {
         streetLayer.setMap(null);
-        for (var i = 0, ii = latlngs.length; i < ii; i++) {
-            var marker = createMarker(latlngs[i]);
-            markers.push(marker);
-        }
+        // 마커 생성
+        showMarkers();
     } else {
         streetLayer.setMap(map);
+        // 마커 숨기기
         hideMarkers();
     }
 });
@@ -75,9 +75,11 @@ btn.on("click", function(e) {
 naver.maps.Event.addListener(map, 'streetLayer_changed', function(streetLayer) {
     if (streetLayer) {
         btn.addClass('control-on');
+        // 마우스 오버 이벤트 활성화
         showMarkersOnHover();
     } else {
         btn.removeClass('control-on');
+        // 마커 숨기기
         hideMarkers();
     }
 });
@@ -100,8 +102,6 @@ function createMarker(position) {
         disableAutoPan: true
     });
 
-    markers.push({ marker: marker, infoWindow: infoWindow });
-
     naver.maps.Event.addListener(marker, 'mouseover', function() {
         infoWindow.open(map, marker);
     });
@@ -110,29 +110,40 @@ function createMarker(position) {
         infoWindow.close();
     });
 
+    naver.maps.Event.addListener(marker, 'click', function() {
+        console.log("상세페이지 이동");
+    });
+
+    markers.push({ marker: marker, infoWindow: infoWindow });
+
     return marker;
 }
 
-function showMarkersOnHover() {
-    for (var i = 0; i < markers.length; i++) {
-        var marker = markers[i].marker;
-        naver.maps.Event.addListener(marker, 'mouseover', (function(marker) {
-            return function() {
-                marker.infoWindow.open(map, marker);
-            };
-        })(marker));
-
-        naver.maps.Event.addListener(marker, 'mouseout', (function(marker) {
-            return function() {
-                marker.infoWindow.close();
-            };
-        })(marker));
+function showMarkers() {
+    for (var i = 0, ii = latlngs.length; i < ii; i++) {
+        var marker = createMarker(latlngs[i]);
     }
 }
 
 function hideMarkers() {
-    for (var i = 0; i < markers.length; i++) {
+    for (var i = 0, ii = markers.length; i < ii; i++) {
         markers[i].marker.setMap(null);
+    }
+}
+
+function showMarkersOnHover() {
+    for (var i = 0, ii = markers.length; i < ii; i++) {
+        var markerData = markers[i];
+        if (markerData && markerData.marker) {
+            var marker = markerData.marker;
+            naver.maps.Event.addListener(marker, 'mouseover', function() {
+                markerData.infoWindow.open(map, marker);
+            });
+
+            naver.maps.Event.addListener(marker, 'mouseout', function() {
+                markerData.infoWindow.close();
+            });
+        }
     }
 }
 </script>
