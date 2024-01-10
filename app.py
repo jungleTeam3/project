@@ -49,20 +49,31 @@ def layout():
 
 @app.route('/api/comment', methods=['POST'])
 def review():
-    try:
-        data = request.json
-        print(data)
-      #   name_receive = data['name']
-      #   like_movie = db.restaurant.find_one({"name":name_receive})
-      #   new_review_num = like_movie['review_num'] + 1
-      #   result = db.restaurant.update_one({"name":name_receive},{'$set':{'review_num':new_review_num}})
+   try:
+      data = request.json
+      print(data['name'])
+      name = data['name']
+      review_num = int(data['review_num'])
+      new_review_num = review_num + 1
+      rating = float(data['rating'])
+      comment = data['comment']
+      selectedRating = float(data['selectedRating'])
 
-      #   if result.modified_count == 1:
-      #       return jsonify({'result': 'success'})
-      #   else:
-      #       return jsonify({'result': 'failure'})
-    except Exception as e:
-        return jsonify({'result': 'failure', 'error': str(e)})
+      new_rating = (float(rating) * int(review_num) + float(selectedRating)) / (int(review_num) + 1)
+
+      db.restaurant.update_one({"name": name}, {'$set': {
+         'review_num': new_review_num,
+         'rating': new_rating
+      }})
+      # 유저 닉네임 추가 해야함
+      db.comment.insert_one({
+         'name': name,
+         'rating': selectedRating,
+         'description': comment
+      })
+      return jsonify({'result': 'success'})
+   except Exception as e:
+      return jsonify({'result': 'failure', 'error': str(e)})
 
 @app.route('/menu/list', methods=['GET'])
 def menus_list():

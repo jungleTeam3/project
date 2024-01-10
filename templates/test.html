@@ -85,7 +85,6 @@
             <button type="button" onclick="loadRestaurantsByCategory('분식')">분식</button>
         </div>
         <div id="restaurants-list">
-            <h3>레스토랑 목록</h3>
             <ul id="restaurant-list-ul">
                 <!-- 여기에 목록이 동적으로 추가됩니다. -->
             </ul>
@@ -424,26 +423,34 @@
     });
 
     async function review_write(name) {
-        
-        var comment = document.getElementById('review-content').value;
-        const ratingRadios = document.querySelectorAll('.rate input[type="radio"]');
-        // rating, review_num, name
+    var comment = document.getElementById('review-content').value;
+    const ratingRadios = document.querySelectorAll('.rate input[type="radio"]');
 
-        if (Array.from(ratingRadios).some(radio => radio.checked) && comment) {
-            const restaurantName = await findRestaurant(name);
-            console.log(restaurantName.name);
+    if (Array.from(ratingRadios).some(radio => radio.checked) && comment) {
+        try {
+            const restaurantData = await findRestaurant(name);
+            console.log(restaurantData.name + restaurantData.rating); // Fix the concatenation line
+
+            const selectedRating = ratingRadios[0].value; // Assuming only one radio button can be checked
+            console.log(selectedRating);
+
             $.ajax({
                 type: "POST",
                 url: "/api/comment",
-                data: JSON.stringify({rating : restaurantName.rating, review_num : restaurantName.review_num, name : restaurantName.name}),
+                data: JSON.stringify({
+                    rating: restaurantData.rating,
+                    review_num: restaurantData.review_num,
+                    name: restaurantData.name,
+                    comment: comment, // Include the comment in the data
+                    selectedRating : selectedRating
+                }),
                 contentType: "application/json",
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        // '좋아요 완료!' 얼럿을 띄웁니다.
-                        alert('데이터 전송 완료!')
-                        // 리뷰 목록에 추가 시키기
+                        alert('데이터 전송 완료!');
+                        // You might want to update the review list here
                     } else {
-                        alert('데이터 전송 실패ㅠㅠ')
+                        alert('데이터 전송 실패ㅠㅠ');
                     }
                 }
             });
@@ -452,13 +459,14 @@
             ratingRadios.forEach(radio => {
                 radio.checked = false;
             });
-
-
-        } else {
-            // 경고 문구 추가
-            console.log("Please select a rating and enter a comment");
+        } catch (error) {
+            console.error(error);
         }
+    } else {
+        console.log("Please select a rating and enter a comment");
     }
+}
+
 
     async function selectRestaurant(name) {
     try {
