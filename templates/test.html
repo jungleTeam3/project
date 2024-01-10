@@ -95,7 +95,6 @@ var map = new naver.maps.Map('map', {
     zoom: 17
 });
 
-var latlngs = [];
 
 var pano = null;
 naver.maps.onJSContentLoaded = function() {
@@ -125,6 +124,7 @@ naver.maps.Event.once(map, 'init', function() {
 // 거리뷰 버튼에 이벤트를 바인딩합니다.
 var btn = $('#street');
 var markers = [];
+var latlngs = [];
 // // 더미 데이터
 // var latlngs = [
 //     new naver.maps.LatLng(37.2995223, 127.0444142),
@@ -249,6 +249,8 @@ function loadRestaurantsByCategory(category) {
                 let restaurants = response['stars_list'];
                 $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
 
+                latlngs.length = 0;
+                hideMarkers();
                 for (let i = 0; i < restaurants.length; i++) {
                     let restaurant = restaurants[i];
                     if (restaurant['category'] === category) {
@@ -256,11 +258,14 @@ function loadRestaurantsByCategory(category) {
                         let location = restaurant['location'];
                         let category = restaurant['category'];
                         // console.log(restaurants[i]);
-                        latlngs.append = new naver.maps.LatLng(restaurant['X'], restaurant['Y']);
+                        latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']));
                         console.log(latlngs);
                         let listItemHtml = `<li>${name} - 위치: ${location}</li>, 카테고리: ${category}</li>`;
                         $('#restaurant-list-ul').append(listItemHtml);
                     }
+                }
+                if (streetLayer.getMap() == null) {
+                    showMarkers();
                 }
                 currentCategory = category; // 현재 선택된 카테고리 업데이트
             },
@@ -279,16 +284,21 @@ function loadRestaurants() {
             let restaurants = response['stars_list'];
             $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
 
+            latlngs.length = 0;
+            hideMarkers();
             for (let i = 0; i < restaurants.length; i++) {
                 let restaurant = restaurants[i];
                 let name = restaurant['name'];
                 let location = restaurant['location'];
                 let category = restaurant['category'];
                 // console.log(restaurant['X']);
-                latlngs.append = new naver.maps.LatLng(restaurant['X'], restaurant['Y']);
+                latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']));
                 // var marker = createMarker(new naver.maps.LatLng(restaurant['X'], restaurant['Y']));
                 let listItemHtml = `<li>${name} - 위치: ${location}, 카테고리: ${category}</li>`;
                 $('#restaurant-list-ul').append(listItemHtml);
+            }
+            if (streetLayer.getMap() == null) {
+                showMarkers();
             }
         },
         error: function (error) {
