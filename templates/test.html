@@ -8,23 +8,94 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm"></script>
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm&submodules=panorama"></script>
+    <style>
+        /* 전체 레이아웃 스타일링 */
+        .layout-container {
+            display: flex;
+        }
+
+        /* 왼쪽 컨테이너 스타일링 */
+        .left-container {
+            width: 65%;
+        }
+
+        /* 지도와 파노라마 스타일링 */
+        #map, #pano {
+            width: 100%; /* 컨테이너 너비에 맞춤 */
+        }
+
+        #map {
+            height: 760px;
+        }
+
+        #pano {
+            height: 300px;
+        }
+
+        /* 오른쪽 컨테이너 (바) 스타일링 */
+        #bar {
+
+            width: 35%; /* 너비 조정 */
+            height: 1060px; /* 기존 높이 유지 */
+            background-color: #f2f2f2; /* 배경색 */
+            /* 추가적인 스타일링 */
+        }
+
+        .find-btn {
+            text-align: center; /* 텍스트 중앙 정렬 */
+        }
+
+        /* find-btn1 클래스에 대한 스타일링 (현재 사용되지 않음) */
+        .find-btn1 {
+            display: inline-block; /* 인라인 블록 요소로 표시 */
+        }
+
+    </style>
 </head>
 <body>
     <div id="button-container">
         <button id="street">거리뷰</button>
     </div>
-    <div id="map" style="width:65%;height:760px"></div>
-    <div id="pano" style="width: 65%;height: 300px;"></div>
-
-    <div id="content">
-        {% block content %}{% endblock %}
+    <div class="layout-container">
+        <div class="left-container">
+            <div id="map" class="left"></div>
+            <div id="pano"></div>
+        </div>
+        <div id="" class="right">
+            <div class="find-btn">
+                <button type="button" onclick="loadRestaurantsByCategory('한식')">한식</button>
+                <button type="button" onclick="loadRestaurantsByCategory('일식')">일식</button>
+                <button type="button" onclick="loadRestaurantsByCategory('중식')">중식</button>
+                <button type="button" onclick="loadRestaurantsByCategory('분식')">분식</button>
+            </div>
+            <div id="restaurants-list">
+                <h3>레스토랑 목록</h3>
+                <ul id="restaurant-list-ul">
+                    <!-- 여기에 목록이 동적으로 추가됩니다. -->
+                </ul>
+            </div>
+            <div class="review-item">
+                <h4>메뉴</h4>
+                <p id="food-item-1">${name}</p>
+                <p id="food-item-2">음식 2</p>
+                <p id="food-item-3">음식 3</p>
+                <p id="food-item-4">음식 4</p>
+            </div>
+                <button>평점선택</button>
+                <p></p>
+                <button type="button" onclick="">로그인 시 작성가능합니다 .</button>
+            </div>
+        </div>
     </div>
+
 
 <script>
 var map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.298623300000145, 127.04152319999955),
     zoom: 17
 });
+
+var latlngs = [];
 
 var pano = null;
 naver.maps.onJSContentLoaded = function() {
@@ -48,24 +119,22 @@ naver.maps.onJSContentLoaded = function() {
 // 거리뷰 레이어를 생성합니다.
 var streetLayer = new naver.maps.StreetLayer();
 naver.maps.Event.once(map, 'init', function() {
-    // streetLayer.setMap(map);
+    streetLayer.setMap(map);
 });
 
 // 거리뷰 버튼에 이벤트를 바인딩합니다.
 var btn = $('#street');
 var markers = [];
-// 더미 데이터
-//  https://pcmap.place.naver.com/restaurant/list?query=%EC%9D%8C%EC%8B%9D%EC%A0%90&x=127.0444088&y=37.2995222&clientX=127.053217&clientY=37.273479&bounds=127.0384329%3B37.2911322%3B127.0505994%3B37.3077406&ts=1704854792304&mapUrl=https%3A%2F%2Fmap.naver.com%2Fp%2Fsearch%2F%EC%9D%8C%EC%8B%9D%EC%A0%90#
-var latlngs = [
-    new naver.maps.LatLng(37.2995223, 127.0444142),
-    new naver.maps.LatLng(37.2998203, 127.0421299),
-    new naver.maps.LatLng( 37.3005585,127.0347399),
-    new naver.maps.LatLng( 37.2999374,127.0434998),
-    new naver.maps.LatLng( 37.2999618, 127.0443075),
-    new naver.maps.LatLng( 37.3002484, 127.0437544),
-    new naver.maps.LatLng( 37.2982363, 127.0445158),
-
-];
+// // 더미 데이터
+// var latlngs = [
+//     new naver.maps.LatLng(37.2995223, 127.0444142),
+//     new naver.maps.LatLng(37.2998203, 127.0421299),
+//     new naver.maps.LatLng( 37.3005585,127.0347399),
+//     new naver.maps.LatLng( 37.2999374,127.0434998),
+//     new naver.maps.LatLng( 37.2999618, 127.0443075),
+//     new naver.maps.LatLng( 37.3002484, 127.0437544),
+//     new naver.maps.LatLng( 37.2982363, 127.0445158),
+// ];
 
 btn.on("click", function(e) {
     e.preventDefault();
@@ -75,6 +144,7 @@ btn.on("click", function(e) {
     if (streetLayer.getMap()) {
         streetLayer.setMap(null);
         // 마커 생성
+        console.log(latlngs);
         showMarkers();
     } else {
         streetLayer.setMap(map);
@@ -157,6 +227,77 @@ function showMarkersOnHover() {
         }
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+var currentCategory = null;
+$(document).ready(function () {
+    loadRestaurants();
+});
+
+
+function loadRestaurantsByCategory(category) {
+    if (currentCategory === category) {
+        // 같은 카테고리가 다시 선택되면 전체 목록을 로드
+        loadRestaurants();
+        currentCategory = null; // 현재 선택된 카테고리 초기화
+    } else {
+        // 다른 카테고리가 선택되면 해당 카테고리의 목록을 로드
+        $.ajax({
+            type: "GET",
+            url: "/api/list",
+            success: function (response) {
+                let restaurants = response['stars_list'];
+                $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
+
+                for (let i = 0; i < restaurants.length; i++) {
+                    let restaurant = restaurants[i];
+                    if (restaurant['category'] === category) {
+                        let name = restaurant['name'];
+                        let location = restaurant['location'];
+                        let category = restaurant['category'];
+                        // console.log(restaurants[i]);
+                        latlngs.append = new naver.maps.LatLng(restaurant['X'], restaurant['Y']);
+                        console.log(latlngs);
+                        let listItemHtml = `<li>${name} - 위치: ${location}</li>, 카테고리: ${category}</li>`;
+                        $('#restaurant-list-ul').append(listItemHtml);
+                    }
+                }
+                currentCategory = category; // 현재 선택된 카테고리 업데이트
+            },
+            error: function (error) {
+                console.error("레스토랑 목록을 불러오는데 실패했습니다: ", error);
+            }
+        });
+    }
+}
+
+function loadRestaurants() {
+    $.ajax({
+        type: "GET",
+        url: "/api/list",
+        success: function (response) {
+            let restaurants = response['stars_list'];
+            $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
+
+            for (let i = 0; i < restaurants.length; i++) {
+                let restaurant = restaurants[i];
+                let name = restaurant['name'];
+                let location = restaurant['location'];
+                let category = restaurant['category'];
+                // console.log(restaurant['X']);
+                latlngs.append = new naver.maps.LatLng(restaurant['X'], restaurant['Y']);
+                // var marker = createMarker(new naver.maps.LatLng(restaurant['X'], restaurant['Y']));
+                let listItemHtml = `<li>${name} - 위치: ${location}, 카테고리: ${category}</li>`;
+                $('#restaurant-list-ul').append(listItemHtml);
+            }
+        },
+        error: function (error) {
+            console.error("레스토랑 목록을 불러오는데 실패했습니다: ", error);
+        }
+    });
+}
+
+
 </script>
 </body>
 </html>
