@@ -16,9 +16,13 @@
     <div id="map" style="width:65%;height:760px"></div>
     <div id="pano" style="width: 65%;height: 300px;"></div>
 
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
 <script>
 var map = new naver.maps.Map('map', {
-    center: new naver.maps.LatLng(37.2856373, 127.0345859),
+    center: new naver.maps.LatLng(37.298623300000145, 127.04152319999955),
     zoom: 17
 });
 
@@ -26,7 +30,7 @@ var pano = null;
 naver.maps.onJSContentLoaded = function() {
     // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
     pano = new naver.maps.Panorama("pano", {
-        position: new naver.maps.LatLng(37.2856373, 127.0345859),
+        position: new naver.maps.LatLng(37.298623300000145, 127.04152319999955),
         pov: {
             pan: -133,
             tilt: 0,
@@ -44,16 +48,23 @@ naver.maps.onJSContentLoaded = function() {
 // 거리뷰 레이어를 생성합니다.
 var streetLayer = new naver.maps.StreetLayer();
 naver.maps.Event.once(map, 'init', function() {
-    streetLayer.setMap(map);
+    // streetLayer.setMap(map);
 });
+
 // 거리뷰 버튼에 이벤트를 바인딩합니다.
 var btn = $('#street');
 var markers = [];
 // 더미 데이터
+//  https://pcmap.place.naver.com/restaurant/list?query=%EC%9D%8C%EC%8B%9D%EC%A0%90&x=127.0444088&y=37.2995222&clientX=127.053217&clientY=37.273479&bounds=127.0384329%3B37.2911322%3B127.0505994%3B37.3077406&ts=1704854792304&mapUrl=https%3A%2F%2Fmap.naver.com%2Fp%2Fsearch%2F%EC%9D%8C%EC%8B%9D%EC%A0%90#
 var latlngs = [
-    new naver.maps.LatLng(37.2856373, 127.0345859),
-    new naver.maps.LatLng(37.2856373, 127.0355859),
-    new naver.maps.LatLng(37.2856373, 127.0365859)
+    new naver.maps.LatLng(37.2995223, 127.0444142),
+    new naver.maps.LatLng(37.2998203, 127.0421299),
+    new naver.maps.LatLng( 37.3005585,127.0347399),
+    new naver.maps.LatLng( 37.2999374,127.0434998),
+    new naver.maps.LatLng( 37.2999618, 127.0443075),
+    new naver.maps.LatLng( 37.3002484, 127.0437544),
+    new naver.maps.LatLng( 37.2982363, 127.0445158),
+
 ];
 
 btn.on("click", function(e) {
