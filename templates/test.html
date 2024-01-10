@@ -3,12 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <title>간단한 지도 표시하기</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm"></script>
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm&submodules=panorama"></script>
+    <script type="text/javascript"
+            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm"></script>
+    <script type="text/javascript"
+            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm&submodules=panorama"></script>
     <style>
+
+        @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+        .rate { display: inline-block;border: 0;margin-right: 15px;}
+        .rate > input {display: none;}
+        .rate > label {float: right;color: #ddd}
+        .rate > label:before {display: inline-block;font-size: 1rem;padding: .3rem .2rem;margin: 0;cursor: pointer;font-family: FontAwesome;content: "\f005 ";}
+        .rate .half:before {content: "\f089 "; position: absolute;padding-right: 0;}
+        .rate input:checked ~ label,
+        .rate label:hover,.rate label:hover ~ label { color: #f73c32 !important;  }
+        .rate input:checked + .rate label:hover,
+        .rate input input:checked ~ label:hover,
+        .rate input:checked ~ .rate label:hover ~ label,
+        .rate label:hover ~ input:checked ~ label { color: #f73c32 !important;  }
         /* 전체 레이아웃 스타일링 */
         .layout-container {
             display: flex;
@@ -16,13 +32,8 @@
 
         /* 왼쪽 컨테이너 스타일링 */
         .left-container {
-            /* position: absolute; */
             width: 65%;
         }
-        
-        /* .right {
-            float: right;
-        } */
 
         /* 지도와 파노라마 스타일링 */
         #map, #pano {
@@ -58,248 +69,434 @@
     </style>
 </head>
 <body>
-    <div id="button-container">
-        <button id="street">거리뷰</button>
+<div id="button-container">
+    <button id="street">거리뷰</button>
+</div>
+<div class="layout-container">
+    <div class="left-container">
+        <div id="map" class="left"></div>
+        <div id="pano"></div>
     </div>
-    <div class="layout-container">
-        <div class="left-container">
-            <div id="map" class="left"></div>
-            <div id="pano"></div>
+    <div id="" class="right">
+        <div class="find-btn">
+            <button type="button" onclick="loadRestaurantsByCategory('한식')">한식</button>
+            <button type="button" onclick="loadRestaurantsByCategory('일식')">일식</button>
+            <button type="button" onclick="loadRestaurantsByCategory('중식')">중식</button>
+            <button type="button" onclick="loadRestaurantsByCategory('분식')">분식</button>
         </div>
-        <div id="" class="right">
-            <div class="find-btn">
-                <button type="button" onclick="loadRestaurantsByCategory('한식')">한식</button>
-                <button type="button" onclick="loadRestaurantsByCategory('일식')">일식</button>
-                <button type="button" onclick="loadRestaurantsByCategory('중식')">중식</button>
-                <button type="button" onclick="loadRestaurantsByCategory('분식')">분식</button>
-            </div>
-            <div id="restaurants-list">
-                <h3>레스토랑 목록</h3>
-                <ul id="restaurant-list-ul">
-                    <!-- 여기에 목록이 동적으로 추가됩니다. -->
-                </ul>
-            </div>
-            <div class="review-item">
-                <h4>메뉴</h4>
-                <p id="food-item-1">${name}</p>
-                <p id="food-item-2">음식 2</p>
-                <p id="food-item-3">음식 3</p>
-                <p id="food-item-4">음식 4</p>
-            </div>
-                <button>평점선택</button>
-                <p></p>
-                <button type="button" onclick="">로그인 시 작성가능합니다 .</button>
-            </div>
+        <div id="restaurants-list">
+            <h3>레스토랑 목록</h3>
+            <ul id="restaurant-list-ul">
+                <!-- 여기에 목록이 동적으로 추가됩니다. -->
+            </ul>
         </div>
+
+        <div id="menu-section" style="display:none;">
+            <h4>메뉴 목록</h4>
+            <ul id="menu-list-ul">
+                <!-- 여기에 메뉴 목록이 동적으로 추가됩니다 -->
+            </ul>
+        </div>
+        <div id="review-section" style="display:none;">
+            <h4>리뷰 작성</h4>
+            <fieldset class="rate">
+                <input type="radio" id="rating10" name="rating" value="5"><label for="rating10" title="5점"></label>
+                <input type="radio" id="rating9" name="rating" value="4.5"><label class="half" for="rating9" title="4.5점"></label>
+                <input type="radio" id="rating8" name="rating" value="4"><label for="rating8" title="4점"></label>
+                <input type="radio" id="rating7" name="rating" value="3.5"><label class="half" for="rating7" title="3.5점"></label>
+                <input type="radio" id="rating6" name="rating" value="3"><label for="rating6" title="3점"></label>
+                <input type="radio" id="rating5" name="rating" value="2.5"><label class="half" for="rating5" title="2.5점"></label>
+                <input type="radio" id="rating4" name="rating" value="2"><label for="rating4" title="2점"></label>
+                <input type="radio" id="rating3" name="rating" value="1.5"><label class="half" for="rating3" title="1.5점"></label>
+                <input type="radio" id="rating2" name="rating" value="1"><label for="rating2" title="1점"></label>
+                <input type="radio" id="rating1" name="rating" value="0.5"><label class="half" for="rating1" title="0.5점"></label>
+            </fieldset>
+
+            <input type="text" id="review-content" placeholder="리뷰 내용"/>
+            <button type="button" onclick="review_write(currentSelectedRestaurant)">리뷰 추가</button>
+        </div>
+
+        <div id="reviews-container" style="display:none;">
+            <h4>리뷰 목록</h4>
+            <ul id="reviews-list">
+                <!-- 여기에 리뷰가 추가됩니다 -->
+            </ul>
+        </div>
+
+
     </div>
+</div>
+</div>
 
 
 <script>
-var map = new naver.maps.Map('map', {
-    center: new naver.maps.LatLng(37.3005585, 127.0347399),
-    zoom: 17
-});
-
-var pano = null;
-naver.maps.onJSContentLoaded = function() {
-    // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
-    pano = new naver.maps.Panorama("pano", {
-        position: new naver.maps.LatLng(37.3005585, 127.0347399),
-        pov: {
-            pan: -133,
-            tilt: 0,
-            fov: 100
-        }
+    var map = new naver.maps.Map('map', {
+        center: new naver.maps.LatLng(37.3005585, 127.0347399),
+        zoom: 17
     });
-    // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
-    naver.maps.Event.addListener(pano, 'pano_changed', function() {
-        var latlng = pano.getPosition();
-        if (!latlng.equals(map.getCenter())) {
-            map.setCenter(latlng);
-        }
-    });
-};
-// 거리뷰 레이어를 생성합니다.
-var streetLayer = new naver.maps.StreetLayer();
-naver.maps.Event.once(map, 'init', function() {
-    streetLayer.setMap(map);
-});
 
-// 거리뷰 버튼에 이벤트를 바인딩합니다.
-var btn = $('#street');
-var markers = [];
-var latlngs = [];
-
-btn.on("click", function(e) {
-    e.preventDefault();
-
-    // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
-    // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
-    if (streetLayer.getMap()) {
-        streetLayer.setMap(null);
-        // 마커 생성
-        console.log(latlngs);
-        showMarkers();
-    } else {
+    var pano = null;
+    naver.maps.onJSContentLoaded = function () {
+        // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
+        pano = new naver.maps.Panorama("pano", {
+            position: new naver.maps.LatLng(37.3005585, 127.0347399),
+            pov: {
+                pan: -133,
+                tilt: 0,
+                fov: 100
+            }
+        });
+        // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
+        naver.maps.Event.addListener(pano, 'pano_changed', function () {
+            var latlng = pano.getPosition();
+            if (!latlng.equals(map.getCenter())) {
+                map.setCenter(latlng);
+            }
+        });
+    };
+    // 거리뷰 레이어를 생성합니다.
+    var streetLayer = new naver.maps.StreetLayer();
+    naver.maps.Event.once(map, 'init', function () {
         streetLayer.setMap(map);
-        // 마커 숨기기
-        hideMarkers();
-    }
-});
-
-naver.maps.Event.addListener(map, 'streetLayer_changed', function(streetLayer) {
-    if (streetLayer) {
-        btn.addClass('control-on');
-        // 마우스 오버 이벤트 활성화
-        showMarkersOnHover();
-    } else {
-        btn.removeClass('control-on');
-        // 마커 숨기기
-        hideMarkers();
-    }
-});
-
-naver.maps.Event.addListener(map, 'click', function(e) {
-    if (streetLayer.getMap()) {
-        var latlng = e.coord;
-        pano.setPosition(latlng);
-    }
-});
-
-function createMarker(position, name) {
-    console.log(name);
-    var marker = new naver.maps.Marker({
-        position: position,
-        map: map
     });
 
-    var infoWindow = new naver.maps.InfoWindow({
-        content: '<div style="width:150px;text-align:center;padding:10px;">Marker at (' + position.lat() + ', ' + position.lng() + ')</div>',
-        disableAutoPan: true
+    // 거리뷰 버튼에 이벤트를 바인딩합니다.
+    var btn = $('#street');
+    var markers = [];
+    var latlngs = [];
+
+    btn.on("click", function (e) {
+        e.preventDefault();
+
+        // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
+        // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
+        if (streetLayer.getMap()) {
+            streetLayer.setMap(null);
+            // 마커 생성
+            console.log(latlngs);
+            showMarkers();
+        } else {
+            streetLayer.setMap(map);
+            // 마커 숨기기
+            hideMarkers();
+        }
     });
 
-    naver.maps.Event.addListener(marker, 'mouseover', function() {
-        infoWindow.open(map, marker);
+    naver.maps.Event.addListener(map, 'streetLayer_changed', function (streetLayer) {
+        if (streetLayer) {
+            btn.addClass('control-on');
+            // 마우스 오버 이벤트 활성화
+            showMarkersOnHover();
+        } else {
+            btn.removeClass('control-on');
+            // 마커 숨기기
+            hideMarkers();
+        }
     });
 
-    naver.maps.Event.addListener(marker, 'mouseout', function() {
-        infoWindow.close();
+    naver.maps.Event.addListener(map, 'click', function (e) {
+        if (streetLayer.getMap()) {
+            var latlng = e.coord;
+            pano.setPosition(latlng);
+        }
     });
 
-    naver.maps.Event.addListener(marker, 'click', function() {
-        console.log("상세페이지 이동");
-    });
+    function createMarker(position, name) {
+        console.log(name);
+        var marker = new naver.maps.Marker({
+            position: position,
+            map: map
+        });
 
-    markers.push({ marker: marker, infoWindow: infoWindow });
+        var infoWindow = new naver.maps.InfoWindow({
+            content: '<div style="width:150px;text-align:center;padding:10px;">Marker at (' + position.lat() + ', ' + position.lng() + ')</div>',
+            disableAutoPan: true
+        });
 
-    return marker;
-}
+        naver.maps.Event.addListener(marker, 'mouseover', function () {
+            infoWindow.open(map, marker);
+        });
 
-function showMarkers() {
-    for (var i = 0, ii = latlngs.length; i < ii; i += 2) {
-        var marker = createMarker(latlngs[i], latlngs[i + 1]);
+        naver.maps.Event.addListener(marker, 'mouseout', function () {
+            infoWindow.close();
+        });
+
+        naver.maps.Event.addListener(marker, 'click', function () {
+            console.log("상세페이지 이동");
+            checkSelectRestaurant(name)
+        });
+
+        markers.push({marker: marker, infoWindow: infoWindow});
+
+        return marker;
     }
-}
 
-function hideMarkers() {
-    for (var i = 0, ii = markers.length; i < ii; i++) {
-        markers[i].marker.setMap(null);
+    function showMarkers() {
+        for (var i = 0, ii = latlngs.length; i < ii; i += 2) {
+            var marker = createMarker(latlngs[i], latlngs[i + 1]);
+        }
     }
-}
 
-function showMarkersOnHover() {
-    for (var i = 0, ii = markers.length; i < ii; i++) {
-        var markerData = markers[i];
-        if (markerData && markerData.marker) {
-            var marker = markerData.marker;
-            naver.maps.Event.addListener(marker, 'mouseover', function() {
-                markerData.infoWindow.open(map, marker);
-            });
+    function hideMarkers() {
+        for (var i = 0, ii = markers.length; i < ii; i++) {
+            markers[i].marker.setMap(null);
+        }
+    }
 
-            naver.maps.Event.addListener(marker, 'mouseout', function() {
-                markerData.infoWindow.close();
+    function showMarkersOnHover() {
+        for (var i = 0, ii = markers.length; i < ii; i++) {
+            var markerData = markers[i];
+            if (markerData && markerData.marker) {
+                var marker = markerData.marker;
+                naver.maps.Event.addListener(marker, 'mouseover', function () {
+                    markerData.infoWindow.open(map, marker);
+                });
+
+                naver.maps.Event.addListener(marker, 'mouseout', function () {
+                    markerData.infoWindow.close();
+                });
+            }
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    var currentCategory = null;
+    $(document).ready(function () {
+        loadRestaurants();
+    });
+
+
+
+    function loadRestaurantsByCategory(category) {
+        if (currentCategory === category) {
+            // 같은 카테고리가 다시 선택되면 전체 목록을 로드
+            loadRestaurants();
+            currentCategory = null; // 현재 선택된 카테고리 초기화
+        } else {
+            // 다른 카테고리가 선택되면 해당 카테고리의 목록을 로드
+            $.ajax({
+                type: "GET",
+                url: "/api/list",
+                success: function (response) {
+                    let restaurants = response['restaurant'];
+                    $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
+
+                    latlngs.length = 0;
+                    hideMarkers();
+                    for (let i = 0; i < restaurants.length; i++) {
+                        let restaurant = restaurants[i];
+                        if (restaurant['category'] === category) {
+                            let name = restaurant['name'];
+                            let location = restaurant['location'];
+                            let category = restaurant['category'];
+                            latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']), name);
+
+                            console.log(latlngs.length);
+                            let listItemHtml = `<li onclick="checkSelectRestaurant('${name}')" >${name} - 위치: ${location}</li>, 카테고리: ${category}</li>`;
+                            $('#restaurant-list-ul').append(listItemHtml);
+                        }
+                    }
+                    if (streetLayer.getMap() == null) {
+                        showMarkers();
+                    }
+                    currentCategory = category; // 현재 선택된 카테고리 업데이트
+                },
+                error: function (error) {
+                    console.error("레스토랑 목록을 불러오는데 실패했습니다: ", error);
+                }
             });
         }
     }
-}
 
-/////////////////////////////////////////////////////////////////////////////////////
-var currentCategory = null;
-$(document).ready(function () {
-    loadRestaurants();
-});
-
-
-function loadRestaurantsByCategory(category) {
-    if (currentCategory === category) {
-        // 같은 카테고리가 다시 선택되면 전체 목록을 로드
-        loadRestaurants();
-        currentCategory = null; // 현재 선택된 카테고리 초기화
-    } else {
-        // 다른 카테고리가 선택되면 해당 카테고리의 목록을 로드
+    function loadRestaurants() {
         $.ajax({
             type: "GET",
             url: "/api/list",
             success: function (response) {
-                let restaurants = response['stars_list'];
+                let restaurants = response['restaurant'];
                 $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
 
                 latlngs.length = 0;
                 hideMarkers();
                 for (let i = 0; i < restaurants.length; i++) {
                     let restaurant = restaurants[i];
-                    if (restaurant['category'] === category) {
-                        let name = restaurant['name'];
-                        let location = restaurant['location'];
-                        let category = restaurant['category'];
-                        latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']), name);
-
-                        console.log(latlngs.length);
-                        let listItemHtml = `<li>${name} - 위치: ${location}</li>, 카테고리: ${category}</li>`;
-                        $('#restaurant-list-ul').append(listItemHtml);
-                    }
+                    let name = restaurant['name'];
+                    let location = restaurant['location'];
+                    let category = restaurant['category'];
+                    latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']), name);
+                    let listItemHtml = `<li onclick="checkSelectRestaurant('${name}')" >${name} - 위치: ${location}</li>, 카테고리: ${category}</li>`;
+                    $('#restaurant-list-ul').append(listItemHtml);
                 }
                 if (streetLayer.getMap() == null) {
                     showMarkers();
                 }
-                currentCategory = category; // 현재 선택된 카테고리 업데이트
             },
             error: function (error) {
                 console.error("레스토랑 목록을 불러오는데 실패했습니다: ", error);
             }
         });
     }
+
+
+
+
+    // 메뉴 데이터를 저장하는 전역 변수
+    var menuData = {};
+
+    function loadmenu() {
+        $.ajax({
+            type: "GET",
+            url: "/menu/list",
+            success: function (response) {
+                let menus = response['menus_list'];
+                menus.forEach(function(menu) {
+                    if (!menuData[menu['name']]) {
+                        menuData[menu['name']] = [];
+                    }
+                    // 메뉴 이름과 가격을 객체로 저장합니다.
+                    menuData[menu['name']].push({
+                        menu: menu['menu'],
+                        price: menu['price']
+                    });
+                });
+            },
+            error: function (error) {
+                console.error("메뉴 목록을 불러오는데 실패했습니다: ", error);
+            }
+        });
+    }
+    // 현재 선택된 레스토랑을 추적하는 전역 변수
+
+
+    var currentSelectedRestaurant = null;
+
+    function checkSelectRestaurant(restaurantName) {
+        // 현재 선택된 레스토랑과 동일한 레스토랑을 클릭했는지 확인합니다.
+        var isSameRestaurantClicked = (currentSelectedRestaurant === restaurantName);
+
+        if (isSameRestaurantClicked) {
+            // 동일한 레스토랑을 다시 클릭한 경우, 모든 섹션을 숨기고 전체 목록을 로드합니다.
+            document.getElementById('menu-section').style.display = 'none';
+            document.getElementById('review-section').style.display = 'none';
+            document.getElementById('reviews-container').style.display = 'none';
+            currentSelectedRestaurant = null;
+            $('#restaurant-list-ul').empty();
+            loadRestaurants();
+        } else {
+            // 다른 레스토랑을 클릭한 경우, 해당 레스토랑만 목록에 남기고 섹션들을 표시합니다.
+            $('#restaurant-list-ul').empty();
+            $('#restaurant-list-ul').append(`<li onclick="checkSelectRestaurant('${restaurantName}')">${restaurantName}</li>`);
+            updateMenuForRestaurant(restaurantName);
+            document.getElementById('menu-section').style.display = 'block';
+            document.getElementById('review-section').style.display = 'block';
+            document.getElementById('reviews-container').style.display = 'block';
+            currentSelectedRestaurant = restaurantName;
+        }
+    }
+
+
+
+    function updateMenuForRestaurant(restaurantName) {
+        var selectedMenu = menuData[restaurantName];
+
+        // 메뉴 정보가 있는 경우, HTML 요소를 업데이트합니다.
+        if (selectedMenu) {
+            var menuListHtml = '';
+            selectedMenu.forEach(function(menuItem) {
+                menuListHtml += '<li>' + menuItem.menu + ' - 가격: ' + menuItem.price + '</li>';
+            });
+            document.getElementById('menu-list-ul').innerHTML = menuListHtml;
+        }
+    }
+
+    // 페이지 로드 시 메뉴 데이터를 불러옵니다.
+    $(document).ready(function () {
+        loadmenu();
+        loadRestaurants();
+    });
+
+    const ratingFieldset = document.querySelector('.rate');
+    // let selectedRating = null;
+    ratingFieldset.addEventListener('change', function(event) {
+        let selectedRating = event.target.value;
+        console.log('Selected Rating:', selectedRating);
+        // 나중에 selectedRating 없을 시 별점 체크 해달라 추가
+    });
+
+    async function review_write(name) {
+        
+        var comment = document.getElementById('review-content').value;
+        const ratingRadios = document.querySelectorAll('.rate input[type="radio"]');
+        // rating, review_num, name
+
+        if (Array.from(ratingRadios).some(radio => radio.checked) && comment) {
+            const restaurantName = await findRestaurant(name);
+            console.log(restaurantName.name);
+            $.ajax({
+                type: "POST",
+                url: "/api/comment",
+                data: JSON.stringify({rating : restaurantName.rating, review_num : restaurantName.review_num, name : restaurantName.name}),
+                contentType: "application/json",
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        // '좋아요 완료!' 얼럿을 띄웁니다.
+                        alert('데이터 전송 완료!')
+                        // 리뷰 목록에 추가 시키기
+                    } else {
+                        alert('데이터 전송 실패ㅠㅠ')
+                    }
+                }
+            });
+
+            document.getElementById('review-content').value = '';
+            ratingRadios.forEach(radio => {
+                radio.checked = false;
+            });
+
+
+        } else {
+            // 경고 문구 추가
+            console.log("Please select a rating and enter a comment");
+        }
+    }
+
+    async function selectRestaurant(name) {
+    try {
+        const selectedRestaurant = await findRestaurant(name);
+        console.log(selectedRestaurant);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-function loadRestaurants() {
-    $.ajax({
-        type: "GET",
-        url: "/api/list",
-        success: function (response) {
-            let restaurants = response['stars_list'];
-            $('#restaurant-list-ul').empty(); // 기존 목록을 지우고 새 목록을 표시
+function findRestaurant(name) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "GET",
+            url: "/api/list",
+            success: function (response) {
+                let restaurants = response['restaurant'];
+                let select = null;
 
-            latlngs.length = 0;
-            hideMarkers();
-            for (let i = 0; i < restaurants.length; i++) {
-                let restaurant = restaurants[i];
-                let name = restaurant['name'];
-                let location = restaurant['location'];
-                let category = restaurant['category'];
-                latlngs.push(new naver.maps.LatLng(restaurant['Y'], restaurant['X']), name);
-                let listItemHtml = `<li>${name} - 위치: ${location}, 카테고리: ${category}</li>`;
-                $('#restaurant-list-ul').append(listItemHtml);
+                for (let i = 0; i < restaurants.length; i++) {
+                    if (restaurants[i]['name'] == name) {
+                        select = restaurants[i];
+                        break;
+                    }
+                }
+
+                if (select !== null) {
+                    resolve(select);
+                } else {
+                    reject("Restaurant not found");
+                }
+            },
+            error: function (error) {
+                reject("Failed to load restaurant list: " + error);
             }
-            if (streetLayer.getMap() == null) {
-                showMarkers();
-            }
-        },
-        error: function (error) {
-            console.error("레스토랑 목록을 불러오는데 실패했습니다: ", error);
-        }
+        });
     });
 }
-
 
 </script>
 </body>

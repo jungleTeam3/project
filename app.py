@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -19,13 +19,66 @@ def map():
 def layout():
    return render_template('layout.html')
 
+# # 음식점 추가 노가다
+# db.restaurant.insert_one({
+# 	'name':'음식점 이름',
+# 	#경도
+# 	'X': 12,
+# 	#위도
+# 	'Y': 12,
+# 	# 카테고리 (한식, 중식, 일식, 양식, 아시안, 분식)
+# 	# 추가 사항 있을 경우 팀원들과 공유
+# 	'category' : "양식",
+# 	# 배달 여부
+# 	'delivery': True,
+# 	# 주소
+# 	'location': "음식점 주소",
+# 	# 평균 식사 가격대 (5,000~10,000, 10,000~15,000, 15,000이상 ))
+# 	'price' : 'string'
+# 	# 기본 평점은 0으로 하고, 이후 코멘트의 평균을 내서 저장하는 식으로 직행 예정
+# 	'rating' : 2.2,
+# 	# 안필요 할 수 있음 (코멘트 테이블에서 가져온 lenth만큼 나누는 식으로 해도 될 듯함)
+# 	'review_num' : 2,
+# 	# 영업 시간 (아래와 같이 기업할 것)
+# 	'business_hours' : "AM 00:00 ~ PM 00:00",
+# 	#정기 휴무일 ('월', '월,화', 확인 안될시 '-')
+# 	'closed_days' : '-',
+# 	#전화번호 (string)
+# 	'call' : '-'
+# })
+
+@app.route('/api/comment', methods=['POST'])
+def review():
+    try:
+        data = request.json
+        print(data)
+      #   name_receive = data['name']
+      #   like_movie = db.restaurant.find_one({"name":name_receive})
+      #   new_review_num = like_movie['review_num'] + 1
+      #   result = db.restaurant.update_one({"name":name_receive},{'$set':{'review_num':new_review_num}})
+
+      #   if result.modified_count == 1:
+      #       return jsonify({'result': 'success'})
+      #   else:
+      #       return jsonify({'result': 'failure'})
+    except Exception as e:
+        return jsonify({'result': 'failure', 'error': str(e)})
+
+@app.route('/menu/list', methods=['GET'])
+def menus_list():
+   # 1. db에서 mystar 목록 전체를 검색합니다. ID는 제외하고 like 가 많은 순으로 정렬합니다.
+   # 참고) find({},{'_id':False}), sort()를 활용하면 굿!
+   menus = list(db.menu.find({}, {'_id': False}).sort('name', -1))
+   # 2. 성공하면 success 메시지와 함께 stars_list 목록을 클라이언트에 전달합니다.
+   return jsonify({'result': 'success', 'menus_list': menus})
+
 @app.route('/api/list', methods=['GET'])
 def stars_list():
    # 1. db에서 mystar 목록 전체를 검색합니다. ID는 제외하고 like 가 많은 순으로 정렬합니다.
    # 참고) find({},{'_id':False}), sort()를 활용하면 굿!
-   stars = list(db.restaurant.find({}, {'_id': False}).sort('name', -1))
+   restaurant = list(db.restaurant.find({}, {'_id': False}).sort('name', -1))
    # 2. 성공하면 success 메시지와 함께 stars_list 목록을 클라이언트에 전달합니다.
-   return jsonify({'result': 'success', 'stars_list': stars})
+   return jsonify({'result': 'success', 'restaurant': restaurant})
 
 
 #종류 별로 하나씩
