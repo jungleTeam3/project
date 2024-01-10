@@ -15,6 +15,10 @@ def home():
 def map():
    return render_template('test.html')
 
+@app.route('/layout')
+def layout():
+   return render_template('layout.html')
+
 @app.route('/api/list', methods=['GET'])
 def stars_list():
    # 1. db에서 mystar 목록 전체를 검색합니다. ID는 제외하고 like 가 많은 순으로 정렬합니다.
