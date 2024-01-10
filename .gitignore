@@ -1,0 +1,9 @@
+.venv
+.vscode
+.DS_Store
+node_modules
+static
+projectone/nohyen/
+projectone/db.py
+projectone/loginapp.py
+templates/card.html
