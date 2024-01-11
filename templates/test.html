@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>간단한 지도 표시하기</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm"></script>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=lqj4d734cm&submodules=panorama"></script>
+</head>
+<body>
+    <div id="button-container">
+        <button id="street">거리뷰</button>
+    </div>
+    <div id="map" style="width:65%;height:760px"></div>
+    <div id="pano" style="width: 65%;height: 300px;"></div>
+
+<script>
+var map = new naver.maps.Map('map', {
+    center: new naver.maps.LatLng(37.2856373, 127.0345859),
+    zoom: 17
+});
+
+var pano = null;
+naver.maps.onJSContentLoaded = function() {
+    // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
+    pano = new naver.maps.Panorama("pano", {
+        position: new naver.maps.LatLng(37.2856373, 127.0345859),
+        pov: {
+            pan: -133,
+            tilt: 0,
+            fov: 100
+        }
+    });
+    // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
+    naver.maps.Event.addListener(pano, 'pano_changed', function() {
+        var latlng = pano.getPosition();
+        if (!latlng.equals(map.getCenter())) {
+            map.setCenter(latlng);
+        }
+    });
+};
+// 거리뷰 레이어를 생성합니다.
+var streetLayer = new naver.maps.StreetLayer();
+naver.maps.Event.once(map, 'init', function() {
+    streetLayer.setMap(map);
+});
+// 거리뷰 버튼에 이벤트를 바인딩합니다.
+var btn = $('#street');
+var markers = [];
+// 더미 데이터
+var latlngs = [
+    new naver.maps.LatLng(37.2856373, 127.0345859),
+    new naver.maps.LatLng(37.2856373, 127.0355859),
+    new naver.maps.LatLng(37.2856373, 127.0365859)
+];
+
+btn.on("click", function(e) {
+    e.preventDefault();
+
+    // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
+    // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
+    if (streetLayer.getMap()) {
+        streetLayer.setMap(null);
+        // 마커 생성
+        showMarkers();
+    } else {
+        streetLayer.setMap(map);
+        // 마커 숨기기
+        hideMarkers();
+    }
+});
+
+naver.maps.Event.addListener(map, 'streetLayer_changed', function(streetLayer) {
+    if (streetLayer) {
+        btn.addClass('control-on');
+        // 마우스 오버 이벤트 활성화
+        showMarkersOnHover();
+    } else {
+        btn.removeClass('control-on');
+        // 마커 숨기기
+        hideMarkers();
+    }
+});
+
+naver.maps.Event.addListener(map, 'click', function(e) {
+    if (streetLayer.getMap()) {
+        var latlng = e.coord;
+        pano.setPosition(latlng);
+    }
+});
+
+function createMarker(position) {
+    var marker = new naver.maps.Marker({
+        position: position,
+        map: map
+    });
+
+    var infoWindow = new naver.maps.InfoWindow({
+        content: '<div style="width:150px;text-align:center;padding:10px;">Marker at (' + position.lat() + ', ' + position.lng() + ')</div>',
+        disableAutoPan: true
+    });
+
+    naver.maps.Event.addListener(marker, 'mouseover', function() {
+        infoWindow.open(map, marker);
+    });
+
+    naver.maps.Event.addListener(marker, 'mouseout', function() {
+        infoWindow.close();
+    });
+
+    naver.maps.Event.addListener(marker, 'click', function() {
+        console.log("상세페이지 이동");
+    });
+
+    markers.push({ marker: marker, infoWindow: infoWindow });
+
+    return marker;
+}
+
+function showMarkers() {
+    for (var i = 0, ii = latlngs.length; i < ii; i++) {
+        var marker = createMarker(latlngs[i]);
+    }
+}
+
+function hideMarkers() {
+    for (var i = 0, ii = markers.length; i < ii; i++) {
+        markers[i].marker.setMap(null);
+    }
+}
+
+function showMarkersOnHover() {
+    for (var i = 0, ii = markers.length; i < ii; i++) {
+        var markerData = markers[i];
+        if (markerData && markerData.marker) {
+            var marker = markerData.marker;
+            naver.maps.Event.addListener(marker, 'mouseover', function() {
+                markerData.infoWindow.open(map, marker);
+            });
+
+            naver.maps.Event.addListener(marker, 'mouseout', function() {
+                markerData.infoWindow.close();
+            });
+        }
+    }
+}
+</script>
+</body>
+</html>

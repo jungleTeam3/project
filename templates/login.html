@@ -1,0 +1,141 @@
+<!Doctype html>
+<html lang="ko">
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            crossorigin="anonymous">
+
+			  <!-- JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+
+            <!--jQuery 플러그인으로 쿠키함수 사용-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        <!--tail wind CSS-->
+        <link href="/static/css/output.css" rel="stylesheet">
+
+        <title>크래프톤 정글 4기 | 정글 맛포럼</title>
+
+        <!-- style -->
+        <style type="text/css">
+            * {
+                font-family: "Stylish", sans-serif;
+            }
+
+            .wrap {
+                width: 900px;
+                margin: auto;
+            }
+
+        </style>
+        <script>
+
+            //로그인 함수
+            function login() {
+                let id = $("#login-id").val();
+                let pw = $("#login-pw").val();
+
+                $.ajax({
+                    type: "POST",
+                    url : "/login",
+                    data : {id_give : id, password_give: pw},
+                    success: function(response){
+                        console.log(response)
+                        if(response['result'] =='success') {
+                            // 토큰을 받아와 mytoken으로 저장.
+                            $.cookie('token', response['token']);
+                            alert('로그인 완료!')
+                            window.location.href = '/'
+                        }
+                        else{
+                            alert('error')
+                        }
+                }})}
+        
+                    
+
+            //로그아웃 함수.. 근데 이러면 API랑 기능이 중복되지 않나?? 의문. 
+    
+
+            function logout(){
+                // 로그인하면서 생성했던 토큰 제거.
+                $.removeCookie('mytoken');
+                alert('로그아웃!')
+                window.location.href='/'
+            }
+            //비밀번호 찾기 함수
+
+            //삭제 함수?
+
+            // function createCookie(value) {
+            //     var now = new Date();
+            //     var expirationDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, 0, 0, 0);
+
+            //     document.cookie = 'token=' + value + '; expires=' + expirationDate + '; path=/';
+            //     };
+            //     $.ajax({
+            //         method: "POST",
+            //         url: "/login",
+            //         data: JSON.stringify({
+            //             "email": id,
+            //             "password": password
+            //         }),
+            //         contentType: 'application/json'
+            //     })
+            //     .done(function (msg) {
+            //         // 요청 전송 후 토큰이 존재하는 경우 토큰을 쿠키에 저장함
+            //         if (msg.access_token) {
+            //             createCookie(msg.access_token);
+            //         }
+            //     });
+        </script>
+
+        
+
+    </head>
+
+<!-- component -->
+    <body class="bg-gray-10 ">
+    <div class="flex justify-center h-screen w-screen items-center">
+     <div class="w-full md:w-1/2 flex flex-col items-center " >
+         <!-- text login -->
+         <h1 class="text-center text-2xl font-bold text-gray-600 mb-6">LOGIN</h1>
+         <!-- email input -->
+         <div class="w-3/4 mb-6">
+             <input type="id" name="id" id="login-id" class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500" placeholder="User Name">
+         </div>
+         <!-- password input -->
+         <div class="w-3/4 mb-6">
+             <input type="password" name="password" id="login-pw" class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500 " placeholder="Password">
+         </div>
+         <!-- remember input -->
+         <div class="w-3/4 flex flex-row justify-between">
+             <div class=" flex items-center gap-x-1">
+                 <input type="checkbox" name="remember" id="" class=" w-4 h-4  ">
+                 <label for="" class="text-sm text-slate-400">Remember me</label>
+             </div>
+             <div>
+                 <a href="#" class="text-sm text-slate-400 hover:text-blue-500">Forgot?</a>
+             </div>
+         </div>
+         <!-- button -->
+         <div class="w-3/4 mt-4">
+             <button type="submit" class="py-4 bg-blue-400 w-full rounded text-blue-50 font-bold hover:bg-blue-700" onclick="login()"> LOGIN</button>
+         </div>
+     </div>
+    </div>
+     </body>
+
+</html>
