@@ -701,7 +701,28 @@
     }
     return null;
    }
+
+   document.addEventListener("DOMContentLoaded", function(){
+    const token = getJwtToken();
+
+    const reviewContenteInput = document.getElementById('review-content');
+    reviewContenteInput.placeholder = token ? '리뷰 내용' : '로그인이 필요합니다';
+   });
             
+ document.getElementById('review-content').addEventListener('click', checktoken);
+
+    function checktoken(click){
+     const token = getJwtToken(); 
+     if(token === null){
+        alert("로그인이 필요합니다!");
+        window.location.href = 'login';
+     }
+     else{
+        console.log("토큰 확인완료");
+     }
+
+    }
+
    async function review_write(name) {
 
 
